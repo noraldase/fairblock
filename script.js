@@ -4,19 +4,19 @@ function terjemahkanJargon() {
     let terjemahan = '';
 
     // Logika penerjemah jargon fun
-    if (input.includes('confidential computing')) {
-        terjemahan = "Sihir Kopi yang Tahu Kapan Harus Menyajikan Informasi Rahasia! 🍄✨";
-    } else if (input.includes('defi') || input.includes('finance')) {
-        terjemahan = "Harta Karun Emas yang Dijaga oleh Jamur Ajaib! 💰🍄";
-    } else if (input.includes('liquidation') || input.includes('manipulation')) {
-        terjemahan = "Hantu Pasar yang Tidak Bisa Melihat Data Rahasiamu! 👻🔒";
+    if (input.includes('confidential computing') || input.includes('komputasi rahasia')) {
+        terjemahan = "Sihir Kopi yang Tahu Kapan Harus Menyajikan Informasi Rahasia! ☕🍄✨";
+    } else if (input.includes('defi') || input.includes('finance') || input.includes('keuangan')) {
+        terjemahan = "Harta Karun Emas yang Dijaga oleh Jamur Ajaib! Jangan Sampai Dicuri! 💰🔒";
+    } else if (input.includes('liquidation') || input.includes('manipulation') || input.includes('manipulasi')) {
+        terjemahan = "Hantu Pasar yang Tidak Bisa Melihat Data Rahasiamu, Yeee! 👻🎉";
     } else if (input === 'fairblock') {
         terjemahan = "Lingkaran Jamur Kita! Tempat Paling Aman di Hutan Crypto. 🛡️";
     } else if (input === '') {
-        terjemahan = "Jangan kosongkan mantra ini!";
+        terjemahan = "Jangan kosongkan mantra ini! Ketik sesuatu, Jamur.";
     }
     else {
-        terjemahan = "Entahlah, mungkin itu adalah nama Cacing di bawah Jamur. 🐛";
+        terjemahan = "Entahlah, mungkin itu adalah nama Cacing di bawah Jamur. 🐛 Coba istilah yang lebih keren!";
     }
 
     resultSpan.textContent = terjemahan;
