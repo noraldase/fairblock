@@ -50,22 +50,67 @@
     </footer>
 
     <script>
-        // SCRIPT SEDERHANA UNTUK MENAMPILKAN NAMA FILE
-        const uploadInput = document.getElementById('imageUpload');
-        const fileNameDisplay = document.getElementById('fileName');
+    const uploadInput = document.getElementById('imageUpload');
+    const fileNameDisplay = document.getElementById('fileName');
+    const generateButton = document.getElementById('generateButton');
+    const statusMessage = document.getElementById('statusMessage');
+    const outputImage = document.getElementById('outputImage');
+    const styleSelect = document.getElementById('styleSelect');
 
-        uploadInput.addEventListener('change', function() {
-            if (this.files && this.files.length > 0) {
-                fileNameDisplay.textContent = `File dipilih: ${this.files[0].name}`;
-                // Di sini Anda perlu menambahkan kode JavaScript/Backend untuk mengirim file dan memprosesnya
+    uploadInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            fileNameDisplay.textContent = `File dipilih: ${this.files[0].name}`;
+            statusMessage.textContent = 'Gambar siap di-generate.';
+        }
+    });
+
+    generateButton.addEventListener('click', async function() {
+        const imageFile = uploadInput.files[0];
+        const selectedStyle = styleSelect.value;
+        
+        // Cek apakah ada file
+        if (!imageFile) {
+            alert("Mohon unggah gambar terlebih dahulu!");
+            return;
+        }
+
+        // Tampilkan status proses
+        statusMessage.textContent = '🚀 Memproses gambar dengan AI... (Tunggu sebentar)';
+        generateButton.disabled = true; // Nonaktifkan tombol saat memproses
+
+        // Siapkan data untuk dikirim ke server (FormData)
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        formData.append('style', selectedStyle);
+
+        try {
+            // KIRIM PERMINTAAN KE BACKEND PYTHON
+            const response = await fetch('http://127.0.0.1:5000/generate-art', {
+                method: 'POST',
+                body: formData 
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Sukses: Tampilkan gambar hasil dari URL yang diberikan backend
+                const outputUrl = `http://127.0.0.1:5000${data.output_url}`;
+                
+                outputImage.src = outputUrl;
+                outputImage.alt = "Hasil Karya Seni AI";
+                statusMessage.textContent = `✅ Berhasil! Gaya: ${selectedStyle}`;
+            } else {
+                // Gagal: Tampilkan pesan error dari backend
+                statusMessage.textContent = `❌ Gagal: ${data.error || 'Terjadi kesalahan server.'}`;
             }
-        });
 
-        // SCRIPT UNTUK KLIK TOMBOL GENERATE (PERLU BACKEND)
-        document.getElementById('generateButton').addEventListener('click', function() {
-            document.getElementById('statusMessage').textContent = 'Memproses... Tunggu sebentar. (Membutuhkan Backend AI yang sebenarnya!)';
-            // PENTING: Untuk fungsi nyata, kode di sini harus berupa AJAX/Fetch API request ke server AI Anda.
-        });
-    </script>
+        } catch (error) {
+            statusMessage.textContent = `❌ Terjadi kesalahan jaringan: ${error.message}`;
+            console.error('Fetch error:', error);
+        } finally {
+            generateButton.disabled = false; // Aktifkan kembali tombol
+        }
+    });
+</script>
 </body>
 </html>
