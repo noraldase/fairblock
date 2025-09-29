@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petrilion Clone - AI Art Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>ArtGen Studio</h1>
+        <p>Ubah foto Anda menjadi mahakarya dengan AI.</p>
+    </header>
+
+    <main>
+        <div class="generator-container">
+            <div class="upload-area">
+                <h2>1. Unggah Gambar Anda</h2>
+                <div class="file-drop-area" onclick="document.getElementById('imageUpload').click()">
+                    <input type="file" id="imageUpload" accept="image/*" hidden>
+                    <p>Seret & Lepas Gambar di Sini, atau Klik untuk Memilih</p>
+                </div>
+                <div id="fileName" class="file-name-display">Belum ada gambar yang dipilih.</div>
+            </div>
+
+            <div class="control-and-output">
+                <h2>2. Atur Gaya & Proses</h2>
+                
+                <label for="styleSelect">Pilih Gaya Seni:</label>
+                <select id="styleSelect">
+                    <option value="default">Gaya Klasik</option>
+                    <option value="cyberpunk">Cyberpunk Sketch</option>
+                    <option value="oilpaint">Lukisan Minyak Impresionis</option>
+                    <option value="anime">Anime Shonen</option>
+                </select>
+
+                <button id="generateButton">⚡ GENERATE ART</button>
+
+                <div class="output-area">
+                    <h2>3. Hasil Karya Seni</h2>
+                    <img id="outputImage" src="placeholder-art.png" alt="Hasil Art Generator" class="result-placeholder">
+                    <p id="statusMessage">Art akan muncul di sini setelah proses.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ArtGen Studio | Petrilion Inspired Design</p>
+    </footer>
+
+    <script>
+        // SCRIPT SEDERHANA UNTUK MENAMPILKAN NAMA FILE
+        const uploadInput = document.getElementById('imageUpload');
+        const fileNameDisplay = document.getElementById('fileName');
+
+        uploadInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileNameDisplay.textContent = `File dipilih: ${this.files[0].name}`;
+                // Di sini Anda perlu menambahkan kode JavaScript/Backend untuk mengirim file dan memprosesnya
+            }
+        });
+
+        // SCRIPT UNTUK KLIK TOMBOL GENERATE (PERLU BACKEND)
+        document.getElementById('generateButton').addEventListener('click', function() {
+            document.getElementById('statusMessage').textContent = 'Memproses... Tunggu sebentar. (Membutuhkan Backend AI yang sebenarnya!)';
+            // PENTING: Untuk fungsi nyata, kode di sini harus berupa AJAX/Fetch API request ke server AI Anda.
+        });
+    </script>
+</body>
+</html>
