@@ -4,7 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petrilion Clone - AI Art Generator</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* CSS yang diberikan sebelumnya harus ada di file style.css, 
+           namun saya tambahkan sedikit untuk placeholder gambar yang lebih jelas. */
+        .result-placeholder {
+            /* Pastikan placeholder ini terlihat jelas sebelum gambar dimuat */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #777;
+            font-size: 1.2em;
+            background-color: #333;
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            border: 1px solid #444;
+            border-radius: 4px;
+            /* Jika img kosong, teks ini akan muncul */
+            content: 'Hasil Art Akan Muncul di Sini';
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -28,7 +48,7 @@
                 
                 <label for="styleSelect">Pilih Gaya Seni:</label>
                 <select id="styleSelect">
-                    <option value="default">Gaya Klasik</option>
+                    <option value="default">Gaya Klasik (Simulasi)</option>
                     <option value="cyberpunk">Cyberpunk Sketch</option>
                     <option value="oilpaint">Lukisan Minyak Impresionis</option>
                     <option value="anime">Anime Shonen</option>
@@ -38,8 +58,8 @@
 
                 <div class="output-area">
                     <h2>3. Hasil Karya Seni</h2>
-                    <img id="outputImage" src="placeholder-art.png" alt="Hasil Art Generator" class="result-placeholder">
-                    <p id="statusMessage">Art akan muncul di sini setelah proses.</p>
+                    <img id="outputImage" src="" alt="Hasil Art Generator" class="result-placeholder">
+                    <p id="statusMessage">Klik "GENERATE ART" setelah mengunggah gambar.</p>
                 </div>
             </div>
         </div>
@@ -50,67 +70,74 @@
     </footer>
 
     <script>
-    const uploadInput = document.getElementById('imageUpload');
-    const fileNameDisplay = document.getElementById('fileName');
-    const generateButton = document.getElementById('generateButton');
-    const statusMessage = document.getElementById('statusMessage');
-    const outputImage = document.getElementById('outputImage');
-    const styleSelect = document.getElementById('styleSelect');
+        const uploadInput = document.getElementById('imageUpload');
+        const fileNameDisplay = document.getElementById('fileName');
+        const generateButton = document.getElementById('generateButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const outputImage = document.getElementById('outputImage');
+        const styleSelect = document.getElementById('styleSelect');
 
-    uploadInput.addEventListener('change', function() {
-        if (this.files && this.files.length > 0) {
-            fileNameDisplay.textContent = `File dipilih: ${this.files[0].name}`;
-            statusMessage.textContent = 'Gambar siap di-generate.';
-        }
-    });
+        // ** PENTING: Tentukan BASE URL secara statis untuk Codespaces **
+        // GANTI 'https://[nama-codespace-anda]-5000.github.dev' dengan URL ASLI Anda
+        // yang Anda dapatkan dari tab PORTS di Codespaces.
+        const BACKEND_BASE_URL = 'https://verbose-invention-pjwj4qv965rjfr5j-5000.app.github.dev'; 
 
-    generateButton.addEventListener('click', async function() {
-        const imageFile = uploadInput.files[0];
-        const selectedStyle = styleSelect.value;
-        
-        // Cek apakah ada file
-        if (!imageFile) {
-            alert("Mohon unggah gambar terlebih dahulu!");
-            return;
-        }
+        // Fungsi sederhana untuk menampilkan nama file yang diunggah
+        uploadInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileNameDisplay.textContent = `File dipilih: ${this.files[0].name}`;
+                statusMessage.textContent = `Gambar siap di-generate. Server: ${BACKEND_BASE_URL}`;
+                outputImage.src = ''; // Bersihkan gambar sebelumnya
+            }
+        });
 
-        // Tampilkan status proses
-        statusMessage.textContent = '🚀 Memproses gambar dengan AI... (Tunggu sebentar)';
-        generateButton.disabled = true; // Nonaktifkan tombol saat memproses
-
-        // Siapkan data untuk dikirim ke server (FormData)
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        formData.append('style', selectedStyle);
-
-        try {
-            // KIRIM PERMINTAAN KE BACKEND PYTHON
-            const response = await fetch('http://127.0.0.1:5000/generate-art', {
-                method: 'POST',
-                body: formData 
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Sukses: Tampilkan gambar hasil dari URL yang diberikan backend
-                const outputUrl = `http://127.0.0.1:5000${data.output_url}`;
-                
-                outputImage.src = outputUrl;
-                outputImage.alt = "Hasil Karya Seni AI";
-                statusMessage.textContent = `✅ Berhasil! Gaya: ${selectedStyle}`;
-            } else {
-                // Gagal: Tampilkan pesan error dari backend
-                statusMessage.textContent = `❌ Gagal: ${data.error || 'Terjadi kesalahan server.'}`;
+        // Logika untuk mengirim gambar ke server Flask
+        generateButton.addEventListener('click', async function() {
+            const imageFile = uploadInput.files[0];
+            const selectedStyle = styleSelect.value;
+            
+            if (!imageFile) {
+                alert("Mohon unggah gambar terlebih dahulu!");
+                return;
             }
 
-        } catch (error) {
-            statusMessage.textContent = `❌ Terjadi kesalahan jaringan: ${error.message}`;
-            console.error('Fetch error:', error);
-        } finally {
-            generateButton.disabled = false; // Aktifkan kembali tombol
-        }
-    });
-</script>
+            // Tampilkan status proses
+            statusMessage.textContent = '🚀 Memproses gambar dengan AI... (Tunggu sebentar)';
+            generateButton.disabled = true; // Nonaktifkan tombol saat memproses
+
+            // Siapkan data untuk dikirim
+            const formData = new FormData();
+            formData.append('image', imageFile);
+            formData.append('style', selectedStyle);
+
+            try {
+                // KIRIM PERMINTAAN POST KE BACKEND
+                const response = await fetch(BACKEND_BASE_URL + '/generate-art', {
+                    method: 'POST',
+                    body: formData 
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Sukses: Tampilkan gambar hasil dari URL yang diberikan backend
+                    const outputUrl = BACKEND_BASE_URL + data.output_url;
+                    
+                    outputImage.src = outputUrl;
+                    outputImage.alt = "Hasil Karya Seni AI";
+                    statusMessage.textContent = `✅ Berhasil! Gaya: ${selectedStyle}.`;
+                } else {
+                    // Gagal: Tampilkan pesan error
+                    statusMessage.textContent = `❌ Gagal: ${data.error || 'Terjadi kesalahan server.'}`;
+                }
+
+            } catch (error) {
+                statusMessage.textContent = `❌ Terjadi kesalahan jaringan: Failed to fetch. (Pastikan URL Backend (${BACKEND_BASE_URL}) sudah benar dan server Flask berjalan di port 5000.)`;
+                console.error('Fetch error:', error);
+            } finally {
+                generateButton.disabled = false; // Aktifkan kembali tombol
+            }
+        });
+    </script>
 </body>
 </html>
