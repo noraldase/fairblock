@@ -1,126 +1,120 @@
+/* Styling Umum */
 body {
-    font-family: sans-serif;
+    background-color: #0d0a1b; /* Biru tua/ungu gelap */
+    color: #00ffaa; /* Neon Hijau */
+    font-family: 'Arial', sans-serif; /* Ganti dengan font "mistis" jika ada */
     margin: 0;
     padding: 0;
-    background-color: #121212; /* Warna gelap khas aplikasi kreatif */
-    color: #f0f0f0;
-    line-height: 1.6;
-}
-
-header {
-    background-color: #1f1f1f;
-    padding: 20px;
     text-align: center;
-    border-bottom: 3px solid #6200EE; /* Garis ungu untuk pembeda */
 }
 
-header h1 {
-    margin: 0;
-    color: #BB86FC; /* Warna aksen ungu muda */
-}
-
-main {
+/* Header dan Navigasi */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.4);
     padding: 20px;
-    max-width: 1200px;
-    margin: auto;
+    border-bottom: 2px solid #00ffaa;
+    box-shadow: 0 0 10px #00ffaa;
 }
-
-.generator-container {
-    display: flex;
-    gap: 30px;
-}
-
-.upload-area, .control-and-output {
-    flex: 1;
-    padding: 20px;
-    background-color: #1f1f1f;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
-
-/* Area Drop File */
-.file-drop-area {
-    border: 3px dashed #3700B3;
-    padding: 40px 20px;
-    text-align: center;
-    cursor: pointer;
+.logo {
+    color: #ff00ff; /* Neon Pink */
     margin-bottom: 10px;
-    transition: background-color 0.3s;
+    text-shadow: 0 0 5px #ff00ff;
 }
-
-.file-drop-area:hover {
-    background-color: #2c2c2c;
-}
-
-.file-name-display {
-    padding: 10px;
-    background-color: #2c2c2c;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
-/* Kontrol */
-label {
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 5px;
+.nav-link {
+    color: #00ffaa;
+    margin: 0 15px;
+    text-decoration: none;
     font-weight: bold;
+    transition: color 0.3s;
+}
+.nav-link:hover {
+    color: #fff;
+    text-shadow: 0 0 10px #fff;
 }
 
-select {
-    width: 100%;
+/* Konten Utama */
+.container {
+    padding: 50px 20px;
+    min-height: 80vh;
+}
+h2 {
+    color: #ff00ff;
+    text-shadow: 0 0 5px #ff00ff;
+}
+
+/* Penerjemah Jargon */
+.jargon-translator {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: rgba(20, 10, 50, 0.7);
+    border: 1px solid #00ffaa;
+    box-shadow: 0 0 20px rgba(0, 255, 170, 0.5);
+}
+#jargonInput {
     padding: 10px;
-    margin-bottom: 20px;
-    background-color: #333;
-    color: #f0f0f0;
-    border: 1px solid #6200EE;
-    border-radius: 4px;
+    width: 80%;
+    margin-right: 10px;
+    background-color: #1a0f30;
+    color: #00ffaa;
+    border: 1px solid #00ffaa;
 }
-
-/* Tombol Generate */
-#generateButton {
-    width: 100%;
-    padding: 15px;
-    background-color: #03DAC6; /* Warna aksen cyan */
-    color: #000;
+button {
+    padding: 10px 20px;
+    background-color: #ff00ff;
+    color: #0d0a1b;
     border: none;
-    border-radius: 4px;
-    font-size: 1.1em;
-    font-weight: bold;
     cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 0 5px #ff00ff;
     transition: background-color 0.3s;
 }
-
-#generateButton:hover {
-    background-color: #018786;
+button:hover {
+    background-color: #fff;
+    box-shadow: 0 0 15px #fff;
 }
-
-/* Area Output */
-.output-area {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.result-placeholder {
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-    background-color: #333;
-    object-fit: contain;
-    border: 1px solid #444;
-    border-radius: 4px;
-}
-
-#statusMessage {
-    margin-top: 10px;
-    color: #BB86FC;
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
+.result-box {
     margin-top: 20px;
-    background-color: #1f1f1f;
-    border-top: 1px solid #333;
+    font-size: 1.2em;
+}
+#translationResult {
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px #fff;
+}
+
+/* Efek Jamur Glowing */
+@keyframes glow {
+    0% { box-shadow: 0 0 5px #00ffaa; }
+    50% { box-shadow: 0 0 20px #00ffaa, 0 0 30px #00ffaa; }
+    100% { box-shadow: 0 0 5px #00ffaa; }
+}
+
+.glowing-mushroom {
+    width: 60px;
+    height: 60px;
+    background-color: #ff00ff; /* Kepala Jamur (Neon Pink) */
+    border-radius: 50% 50% 0 0;
+    margin: 20px auto 10px;
+    position: relative;
+    animation: glow 2s infinite alternate;
+}
+.glowing-mushroom::after {
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 15px;
+    width: 30px;
+    height: 40px;
+    background-color: #fff; /* Batang Jamur (Putih Bersinar) */
+    border-radius: 0 0 10px 10px;
+}
+
+/* Footer */
+footer {
+    padding: 15px;
+    background-color: #1a0f30;
+    border-top: 1px solid #00ffaa;
     font-size: 0.8em;
+    color: rgba(0, 255, 170, 0.7);
 }
