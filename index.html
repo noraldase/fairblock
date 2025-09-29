@@ -3,33 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petrilion Clone - AI Art Generator</title>
+    <title>Petrilion Clone - Gemini AI Art Prompt Generator</title>
     <link rel="stylesheet" href="style.css"> 
     <style>
-        /* CSS yang diberikan sebelumnya harus ada di file style.css, 
-           namun saya tambahkan sedikit untuk placeholder gambar yang lebih jelas. */
-        .result-placeholder {
-            /* Pastikan placeholder ini terlihat jelas sebelum gambar dimuat */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #777;
-            font-size: 1.2em;
-            background-color: #333;
-            width: 100%;
-            height: 400px;
-            object-fit: contain;
-            border: 1px solid #444;
-            border-radius: 4px;
-            /* Jika img kosong, teks ini akan muncul */
-            content: 'Hasil Art Akan Muncul di Sini';
+        /* CSS Tambahan untuk Tampilan Teks Prompt */
+        .result-placeholder { display: none; } /* Sembunyikan img placeholder */
+        #statusMessage { 
+            text-align: left; 
+            padding: 10px;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>ArtGen Studio</h1>
-        <p>Ubah foto Anda menjadi mahakarya dengan AI.</p>
+        <h1>ArtGen Studio (Gemini-Powered)</h1>
+        <p>Unggah gambar dan minta AI membuat *prompt* seni yang sempurna.</p>
     </header>
 
     <main>
@@ -46,27 +34,27 @@
             <div class="control-and-output">
                 <h2>2. Atur Gaya & Proses</h2>
                 
-                <label for="styleSelect">Pilih Gaya Seni:</label>
+                <label for="styleSelect">Pilih Gaya Seni (untuk Prompt):</label>
                 <select id="styleSelect">
-                    <option value="default">Gaya Klasik (Simulasi)</option>
-                    <option value="cyberpunk">Cyberpunk Sketch</option>
-                    <option value="oilpaint">Lukisan Minyak Impresionis</option>
-                    <option value="anime">Anime Shonen</option>
+                    <option value="anime shonen">Anime Shonen</option>
+                    <option value="cyberpunk detailed">Cyberpunk Detailed</option>
+                    <option value="lukisan minyak">Lukisan Minyak Impresionis</option>
+                    <option value="realistis">Fotografi Realistis</option>
                 </select>
 
-                <button id="generateButton">⚡ GENERATE ART</button>
+                <button id="generateButton">⚡ GENERATE PROMPT (via Gemini)</button>
 
                 <div class="output-area">
-                    <h2>3. Hasil Karya Seni</h2>
-                    <img id="outputImage" src="" alt="Hasil Art Generator" class="result-placeholder">
-                    <p id="statusMessage">Klik "GENERATE ART" setelah mengunggah gambar.</p>
+                    <h2>3. Hasil Prompt AI</h2>
+                    <img id="outputImage" src="" alt="Hasil Art Generator" class="result-placeholder" style="display:none;">
+                    <p id="statusMessage">Klik "GENERATE PROMPT" setelah mengunggah gambar.</p>
                 </div>
             </div>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 ArtGen Studio | Petrilion Inspired Design</p>
+        <p>&copy; 2025 ArtGen Studio | Powered by Gemini API</p>
     </footer>
 
     <script>
@@ -77,17 +65,16 @@
         const outputImage = document.getElementById('outputImage');
         const styleSelect = document.getElementById('styleSelect');
 
-        // ** PENTING: Tentukan BASE URL secara statis untuk Codespaces **
-        // GANTI 'https://[nama-codespace-anda]-5000.github.dev' dengan URL ASLI Anda
-        // yang Anda dapatkan dari tab PORTS di Codespaces.
-        const BACKEND_BASE_URL = window.location.protocol + '//' + window.location.host.split('-')[0] + '-5000.' + window.location.host.split('.').slice(1).join('.');
+        // ** PENTING: GANTI URL Codespaces Anda di sini! **
+        const BACKEND_BASE_URL = 'https://verbose-invention-pjwj4qv965rjfr5j-5000.app.github.dev'; 
+        // GANTI INI: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         // Fungsi sederhana untuk menampilkan nama file yang diunggah
         uploadInput.addEventListener('change', function() {
             if (this.files && this.files.length > 0) {
                 fileNameDisplay.textContent = `File dipilih: ${this.files[0].name}`;
-                statusMessage.textContent = `Gambar siap di-generate. Server: ${BACKEND_BASE_URL}`;
-                outputImage.src = ''; // Bersihkan gambar sebelumnya
+                statusMessage.innerHTML = `Gambar siap di-generate. Target Server: <code style="color:#03DAC6">${BACKEND_BASE_URL}</code>`;
+                outputImage.style.display = 'none'; 
             }
         });
 
@@ -101,17 +88,15 @@
                 return;
             }
 
-            // Tampilkan status proses
-            statusMessage.textContent = '🚀 Memproses gambar dengan AI... (Tunggu sebentar)';
-            generateButton.disabled = true; // Nonaktifkan tombol saat memproses
+            statusMessage.innerHTML = '🚀 **Memanggil Gemini API**... Menganalisis gambar dan menghasilkan prompt...';
+            generateButton.disabled = true;
 
-            // Siapkan data untuk dikirim
             const formData = new FormData();
             formData.append('image', imageFile);
             formData.append('style', selectedStyle);
 
             try {
-                // KIRIM PERMINTAAN POST KE BACKEND
+                // PANGGILAN API PERTAMA: Mengirim gambar dan mendapatkan nama file teks
                 const response = await fetch(BACKEND_BASE_URL + '/generate-art', {
                     method: 'POST',
                     body: formData 
@@ -120,22 +105,29 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Sukses: Tampilkan gambar hasil dari URL yang diberikan backend
+                    // PANGGILAN API KEDUA: Mengambil konten file teks (prompt)
                     const outputUrl = BACKEND_BASE_URL + data.output_url;
                     
-                    outputImage.src = outputUrl;
-                    outputImage.alt = "Hasil Karya Seni AI";
-                    statusMessage.textContent = `✅ Berhasil! Gaya: ${selectedStyle}.`;
+                    const textResponse = await fetch(outputUrl);
+                    const resultText = await textResponse.text();
+
+                    // Tampilkan hasil teks
+                    outputImage.style.display = 'none';
+                    statusMessage.innerHTML = `
+                        ✅ **Prompt Berhasil Dibuat oleh Gemini!** Gaya yang diminta: ${selectedStyle}.<br><br>
+                        <div style="border: 1px dashed #BB86FC; padding: 15px; margin-top: 10px; background: #2c2c2c; color: #fff; font-size: 1em; line-height: 1.4; text-align: left;">
+                            <strong>PROMPT:</strong> ${resultText}
+                        </div>
+                    `;
                 } else {
-                    // Gagal: Tampilkan pesan error
-                    statusMessage.textContent = `❌ Gagal: ${data.error || 'Terjadi kesalahan server.'}`;
+                    statusMessage.innerHTML = `❌ Gagal: ${data.error || 'Terjadi kesalahan server.'}`;
                 }
 
             } catch (error) {
-                statusMessage.textContent = `❌ Terjadi kesalahan jaringan: Failed to fetch. (Pastikan URL Backend (${BACKEND_BASE_URL}) sudah benar dan server Flask berjalan di port 5000.)`;
+                statusMessage.innerHTML = `❌ Terjadi kesalahan jaringan: Failed to fetch. (Pastikan URL Backend (${BACKEND_BASE_URL}) sudah benar dan server Flask berjalan di port 5000.)`;
                 console.error('Fetch error:', error);
             } finally {
-                generateButton.disabled = false; // Aktifkan kembali tombol
+                generateButton.disabled = false;
             }
         });
     </script>
