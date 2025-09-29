@@ -3,133 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petrilion Clone - Gemini AI Art Prompt Generator</title>
-    <link rel="stylesheet" href="style.css"> 
-    <style>
-        /* CSS Tambahan untuk Tampilan Teks Prompt */
-        .result-placeholder { display: none; } /* Sembunyikan img placeholder */
-        #statusMessage { 
-            text-align: left; 
-            padding: 10px;
-        }
-    </style>
+    <title>Dunia Jamur Rahasia Fairblock</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>ArtGen Studio (Gemini-Powered)</h1>
-        <p>Unggah gambar dan minta AI membuat *prompt* seni yang sempurna.</p>
+    <header class="navbar">
+        <h1 class="logo">Fairblock.net: Fairy Ring</h1>
+        <nav>
+            <a href="#" class="nav-link">Pintu Masuk Hutan</a>
+            <a href="#" class="nav-link">Mantra Rahasia</a>
+            <a href="#" class="nav-link">Klan Jamur</a>
+            <a href="#" class="nav-link">Peta Harta Karun</a>
+        </nav>
     </header>
 
-    <main>
-        <div class="generator-container">
-            <div class="upload-area">
-                <h2>1. Unggah Gambar Anda</h2>
-                <div class="file-drop-area" onclick="document.getElementById('imageUpload').click()">
-                    <input type="file" id="imageUpload" accept="image/*" hidden>
-                    <p>Seret & Lepas Gambar di Sini, atau Klik untuk Memilih</p>
-                </div>
-                <div id="fileName" class="file-name-display">Belum ada gambar yang dipilih.</div>
-            </div>
+    <main class="container">
+        <section class="mushroom-intro">
+            <div class="glowing-mushroom"></div> 
+            <h2>Selamat Datang, Jamur Baru!</h2>
+            <p>Di kedalaman Dunia Rahasia ini, data sensitif dilindungi oleh Komputasi Rahasia Dinamis. Cobalah mantra di bawah ini.</p>
+        </section>
 
-            <div class="control-and-output">
-                <h2>2. Atur Gaya & Proses</h2>
-                
-                <label for="styleSelect">Pilih Gaya Seni (untuk Prompt):</label>
-                <select id="styleSelect">
-                    <option value="anime shonen">Anime Shonen</option>
-                    <option value="cyberpunk detailed">Cyberpunk Detailed</option>
-                    <option value="lukisan minyak">Lukisan Minyak Impresionis</option>
-                    <option value="realistis">Fotografi Realistis</option>
-                </select>
+        <section class="jargon-translator">
+            <h3>Penerjemah Jargon Misteri</h3>
+            <p>Masukkan istilah teknis untuk diubah menjadi bahasa jamur yang lucu:</p>
+            <input type="text" id="jargonInput" placeholder="Contoh: Dynamic Confidential Computing">
+            <button onclick="terjemahkanJargon()">Terjemahkan!</button>
+            <p class="result-box">Hasil Terjemahan: <span id="translationResult">...</span></p>
+        </section>
 
-                <button id="generateButton">⚡ GENERATE PROMPT (via Gemini)</button>
-
-                <div class="output-area">
-                    <h2>3. Hasil Prompt AI</h2>
-                    <img id="outputImage" src="" alt="Hasil Art Generator" class="result-placeholder" style="display:none;">
-                    <p id="statusMessage">Klik "GENERATE PROMPT" setelah mengunggah gambar.</p>
-                </div>
-            </div>
-        </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 ArtGen Studio | Powered by Gemini API</p>
+        <p>&copy; 2024 Fairblock Fun Project. Jangan Dibawa Serius!</p>
     </footer>
 
-    <script>
-        const uploadInput = document.getElementById('imageUpload');
-        const fileNameDisplay = document.getElementById('fileName');
-        const generateButton = document.getElementById('generateButton');
-        const statusMessage = document.getElementById('statusMessage');
-        const outputImage = document.getElementById('outputImage');
-        const styleSelect = document.getElementById('styleSelect');
-
-        // ** PENTING: GANTI URL Codespaces Anda di sini! **
-        const BACKEND_BASE_URL = 'https://verbose-invention-pjwj4qv965rjfr5j-5000.app.github.dev'; 
-        // GANTI INI: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-        // Fungsi sederhana untuk menampilkan nama file yang diunggah
-        uploadInput.addEventListener('change', function() {
-            if (this.files && this.files.length > 0) {
-                fileNameDisplay.textContent = `File dipilih: ${this.files[0].name}`;
-                statusMessage.innerHTML = `Gambar siap di-generate. Target Server: <code style="color:#03DAC6">${BACKEND_BASE_URL}</code>`;
-                outputImage.style.display = 'none'; 
-            }
-        });
-
-        // Logika untuk mengirim gambar ke server Flask
-        generateButton.addEventListener('click', async function() {
-            const imageFile = uploadInput.files[0];
-            const selectedStyle = styleSelect.value;
-            
-            if (!imageFile) {
-                alert("Mohon unggah gambar terlebih dahulu!");
-                return;
-            }
-
-            statusMessage.innerHTML = '🚀 **Memanggil Gemini API**... Menganalisis gambar dan menghasilkan prompt...';
-            generateButton.disabled = true;
-
-            const formData = new FormData();
-            formData.append('image', imageFile);
-            formData.append('style', selectedStyle);
-
-            try {
-                // PANGGILAN API PERTAMA: Mengirim gambar dan mendapatkan nama file teks
-                const response = await fetch(BACKEND_BASE_URL + '/generate-art', {
-                    method: 'POST',
-                    body: formData 
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // PANGGILAN API KEDUA: Mengambil konten file teks (prompt)
-                    const outputUrl = BACKEND_BASE_URL + data.output_url;
-                    
-                    const textResponse = await fetch(outputUrl);
-                    const resultText = await textResponse.text();
-
-                    // Tampilkan hasil teks
-                    outputImage.style.display = 'none';
-                    statusMessage.innerHTML = `
-                        ✅ **Prompt Berhasil Dibuat oleh Gemini!** Gaya yang diminta: ${selectedStyle}.<br><br>
-                        <div style="border: 1px dashed #BB86FC; padding: 15px; margin-top: 10px; background: #2c2c2c; color: #fff; font-size: 1em; line-height: 1.4; text-align: left;">
-                            <strong>PROMPT:</strong> ${resultText}
-                        </div>
-                    `;
-                } else {
-                    statusMessage.innerHTML = `❌ Gagal: ${data.error || 'Terjadi kesalahan server.'}`;
-                }
-
-            } catch (error) {
-                statusMessage.innerHTML = `❌ Terjadi kesalahan jaringan: Failed to fetch. (Pastikan URL Backend (${BACKEND_BASE_URL}) sudah benar dan server Flask berjalan di port 5000.)`;
-                console.error('Fetch error:', error);
-            } finally {
-                generateButton.disabled = false;
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
