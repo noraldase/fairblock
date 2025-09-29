@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fungus's Fairy Ring Adventure (Local Game)</title>
+    <title>Fungus's Fairy Ring Adventure</title>
     <style>
-        /* CSS Dasar untuk Estetika Jamur/Neon */
+        /* Styling Dasar */
         body {
             background-color: #1a0f30; 
             color: #00ffaa;
@@ -13,9 +13,24 @@
             text-align: center;
             padding: 20px;
         }
-        h1 { color: #ff00ff; text-shadow: 0 0 8px #ff00ff; }
-        h3 { color: #00ffaa; margin-top: 30px; }
-        input, button {
+        h1 { color: #ff00ff; text-shadow: 0 0 8px #ff00ff; margin-bottom: 20px; }
+        
+        /* Area Game dan Canvas */
+        #gameContainer {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative; /* Penting untuk tombol mobile */
+        }
+        #gameCanvas {
+            border: 3px solid #00ffaa;
+            background-color: #0d0a1b; /* Latar belakang game */
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        /* Input dan Tombol */
+        input[type="text"], button {
             padding: 10px 15px;
             margin: 5px;
             border: 2px solid #00ffaa;
@@ -24,54 +39,78 @@
             cursor: pointer;
         }
         button:hover { background-color: #3e246b; }
-        #game-area {
-            border: 3px dashed #ff00ff;
-            padding: 30px;
-            margin: 30px auto;
-            max-width: 600px;
+        
+        /* Tombol Kontrol Mobile (D-Pad) */
+        #mobileControls {
+            display: none; /* Sembunyikan secara default */
+            justify-content: center;
+            margin-top: 15px;
+            user-select: none;
         }
+        #mobileControls button {
+            padding: 20px;
+            font-size: 20px;
+            background-color: rgba(255, 0, 255, 0.8);
+            border: none;
+            color: white;
+            margin: 0 5px;
+            width: 80px;
+        }
+
+        /* Tampilkan Kontrol Mobile hanya di layar kecil (Handphone) */
+        @media (max-width: 768px) {
+            #mobileControls {
+                display: flex; 
+            }
+        }
+        
+        /* Leaderboard */
         #leaderboard {
             max-width: 400px;
-            margin: 20px auto;
-            border: 1px solid #00ffaa;
+            margin: 40px auto;
+            border: 1px solid #ff00ff;
             padding: 15px;
             text-align: left;
+            background-color: rgba(20, 10, 50, 0.7);
         }
         #leaderboard ol {
             padding-left: 20px;
             list-style-type: none;
         }
         #leaderboard li {
-            padding: 5px 0;
-            border-bottom: 1px dashed rgba(0, 255, 170, 0.3);
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 0, 255, 0.3);
         }
+        #leaderboard li:last-child { border-bottom: none; }
+
     </style>
 </head>
 <body>
 
     <h1>🍄 Fungus's Fairy Ring Adventure 🍄</h1>
-    <p>Masukkan nama Anda untuk memulai petualangan jamur dan catat skor tertinggi Anda!</p>
+    
+    <div id="gameContainer">
+        <p>Masukkan nama Anda sebelum memulai:</p>
+        <input type="text" id="playerName" placeholder="Nama Petualang">
+        <button id="startButton">Mulai Game (Simulasi)!</button>
 
-    <div id="game-area">
-        <h3>1. Masukkan Nama Petualang</h3>
-        <input type="text" id="playerName" placeholder="Nama Anda (Misal: Fungus123)">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
         
-        <h3>2. Mulai Petualangan!</h3>
-        <button onclick="startGame()">Mainkan Sekarang!</button>
-
-        <p id="gameResult" style="margin-top: 20px; font-weight: bold;"></p>
+        <div id="mobileControls">
+            <button id="leftBtn" ontouchstart="move('left', true)" ontouchend="move('left', false)">&#9664; Kiri</button>
+            <button id="jumpBtn" ontouchstart="move('jump', true)" ontouchend="move('jump', false)">&#9650; Lompat</button>
+            <button id="rightBtn" ontouchstart="move('right', true)" ontouchend="move('right', false)">Kanan &#9654;</button>
+        </div>
     </div>
 
     <div id="leaderboard">
-        <h3>Papan Peringkat Lokal (Browser Anda)</h3>
-        <ol id="scoreList"></ol>
-        <button onclick="clearLeaderboard()">Hapus Peringkat</button>
+        <h3>Papan Peringkat Global</h3>
+        <p style="font-size: 0.9em; color: #ff00ff;">(Simulasi data server)</p>
+        <ol id="globalScoreList">
+            <li>Memuat data...</li>
+        </ol>
     </div>
 
     <script src="script.js"></script>
-    <script>
-        // Memastikan leaderboard dimuat saat halaman pertama kali dibuka
-        document.addEventListener('DOMContentLoaded', loadLeaderboard);
-    </script>
 </body>
 </html>
