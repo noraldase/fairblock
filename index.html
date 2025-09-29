@@ -80,7 +80,7 @@
         // ** PENTING: Tentukan BASE URL secara statis untuk Codespaces **
         // GANTI 'https://[nama-codespace-anda]-5000.github.dev' dengan URL ASLI Anda
         // yang Anda dapatkan dari tab PORTS di Codespaces.
-        const BACKEND_BASE_URL = 'https://verbose-invention-pjwj4qv965rjfr5j-5000.app.github.dev'; 
+        const BACKEND_BASE_URL = window.location.protocol + '//' + window.location.host.split('-')[0] + '-5000.' + window.location.host.split('.').slice(1).join('.');
 
         // Fungsi sederhana untuk menampilkan nama file yang diunggah
         uploadInput.addEventListener('change', function() {
