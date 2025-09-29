@@ -1,89 +1,135 @@
-const STORAGE_KEY = 'fungusLeaderboard';
+// ===========================================
+// BAGIAN I: KONTROL GAME (WASD / TOUCH)
+// ===========================================
 
-// --- FUNGSI UTAMA GAME ---
-function startGame() {
-    const playerNameInput = document.getElementById('playerName');
-    const name = playerNameInput.value.trim();
-    const resultDisplay = document.getElementById('gameResult');
+let keys = { left: false, right: false, jump: false };
+let gameRunning = false;
+let playerX = 50; // Posisi X awal pemain (simulasi)
+let playerY = 300; // Posisi Y awal pemain (simulasi)
 
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function gameLoop() {
+    if (!gameRunning) return;
+
+    // 1. CLEAR SCREEN
+    ctx.fillStyle = '#0d0a1b';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 2. INPUT & LOGIKA GERAK
+    if (keys.left) playerX -= 5;
+    if (keys.right) playerX += 5;
+    // Jika keys.jump, terapkan logika lompat di sini (kompleks)
+
+    // Batasi pergerakan di dalam canvas
+    if (playerX < 0) playerX = 0;
+    if (playerX > canvas.width - 20) playerX = canvas.width - 20;
+
+    // 3. GAMBAR KARAKTER (SIMULASI JAMUR KOTAK)
+    ctx.fillStyle = '#ff00ff';
+    ctx.fillRect(playerX, playerY, 20, 20); // Kotak 20x20 mewakili Fungus
+
+    // 4. LOOP
+    requestAnimationFrame(gameLoop);
+}
+
+// Fungsi Pemicu Kontrol Mobile
+window.move = function(direction, isDown) {
+    keys[direction] = isDown;
+    // console.log(`Mobile: ${direction}: ${isDown ? 'Down' : 'Up'}`);
+}
+
+// Fungsi Pemicu Kontrol Keyboard (WASD/Panah)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = true;
+    if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = true;
+    if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ') keys.jump = true;
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') keys.left = false;
+    if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') keys.right = false;
+    if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === ' ') keys.jump = false;
+});
+
+document.getElementById('startButton').addEventListener('click', () => {
+    const name = document.getElementById('playerName').value.trim();
     if (name === '') {
-        resultDisplay.textContent = 'Nama Petualang tidak boleh kosong!';
+        alert('Mohon masukkan nama Anda terlebih dahulu!');
+        return;
+    }
+    
+    // Reset dan Mulai Game Loop
+    playerX = 50;
+    gameRunning = true;
+    gameLoop();
+    alert(`Game dimulai! Coba gerakkan kotak jamur dengan WASD/Panah atau tombol di bawah!`);
+    
+    // SIMULASI GAME END SETELAH 5 DETIK
+    setTimeout(() => {
+        gameRunning = false;
+        const finalScore = Math.floor(Math.random() * 20000) + 5000;
+        alert(`Game Selesai! Skor Anda: ${finalScore}`);
+        submitScoreToServer(name, finalScore); // Kirim skor ke simulasi server
+    }, 5000); // 5 detik simulasi game
+
+});
+
+
+// ===========================================
+// BAGIAN II: LEADERBOARD GLOBAL (SIMULASI)
+// ===========================================
+
+// VARIABEL SIMULASI DATA GLOBAL SERVER (GANTIKAN DENGAN DATABASE ASLI)
+let globalScores = [
+    { name: "Fungus-Master", score: 25000, date: '1 jam lalu' },
+    { name: "Keybearer", score: 22100, date: '3 jam lalu' },
+    { name: "Anonim", score: 19800, date: 'Hari ini' },
+];
+
+// SIMULASI PENGIRIMAN SKOR KE SERVER
+function submitScoreToServer(playerName, finalScore) {
+    // 1. Simulasikan pengiriman data
+    console.log(`Mengirim skor ${finalScore} untuk ${playerName} ke API...`);
+
+    // 2. Simulasikan respon dari server (menambahkannya ke array global)
+    globalScores.push({ name: playerName, score: finalScore, date: 'Baru saja' });
+    
+    // 3. Urutkan dan batasi
+    globalScores.sort((a, b) => b.score - a.score);
+    globalScores = globalScores.slice(0, 10); // Batasi 10 besar
+
+    // 4. Muat ulang leaderboard
+    loadGeneralLeaderboard();
+}
+
+
+// SIMULASI PENGAMBILAN DATA DARI SERVER
+function loadGeneralLeaderboard() {
+    const leaderboardList = document.getElementById('globalScoreList');
+
+    // Di SINI, Anda akan menggunakan fetch() untuk mengambil data dari API SERVER ASLI Anda.
+    // Contoh: fetch('https://api.yourgame.com/leaderboard').then(res => res.json()).then(data => {...})
+
+    // Untuk saat ini, kita gunakan data simulasi:
+    const scores = globalScores; 
+
+    leaderboardList.innerHTML = '';
+    if (scores.length === 0) {
+        leaderboardList.innerHTML = '<li>Belum ada skor tercatat. Jadilah yang pertama!</li>';
         return;
     }
 
-    // 1. Simulasi Permainan dan Skor
-    // Menghasilkan skor acak antara 1000 hingga 10000
-    const score = Math.floor(Math.random() * 9001) + 1000; 
-    
-    // 2. Tampilkan Hasil Permainan
-    resultDisplay.textContent = `Selamat, ${name}! Anda mendapatkan skor: ${score} 🗝️`;
-
-    // 3. Simpan Skor ke LocalStorage
-    saveScore(name, score);
-}
-
-// --- FUNGSI PENYIMPANAN DATA ---
-function getLeaderboard() {
-    // Mengambil data dari LocalStorage
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-}
-
-function saveScore(name, score) {
-    let leaderboard = getLeaderboard();
-
-    // Cek apakah pemain ini sudah ada
-    const existingIndex = leaderboard.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-
-    if (existingIndex !== -1) {
-        // Jika sudah ada, update hanya jika skor baru lebih tinggi
-        if (score > leaderboard[existingIndex].score) {
-            leaderboard[existingIndex].score = score;
-            leaderboard[existingIndex].date = new Date().toLocaleString();
-            document.getElementById('gameResult').textContent += ' (REKOR BARU!)';
-        } else {
-             document.getElementById('gameResult').textContent += ' (Skor tidak memecahkan rekor Anda.)';
-        }
-    } else {
-        // Jika pemain baru, tambahkan
-        leaderboard.push({ name: name, score: score, date: new Date().toLocaleString() });
-    }
-
-    // Urutkan leaderboard dari skor tertinggi
-    leaderboard.sort((a, b) => b.score - a.score);
-
-    // Simpan kembali ke LocalStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(leaderboard));
-    
-    // Muat ulang tampilan leaderboard
-    loadLeaderboard();
-}
-
-// --- FUNGSI TAMPILAN LEADERBOARD ---
-function loadLeaderboard() {
-    const leaderboard = getLeaderboard();
-    const listElement = document.getElementById('scoreList');
-    listElement.innerHTML = ''; // Kosongkan list sebelumnya
-
-    if (leaderboard.length === 0) {
-        listElement.innerHTML = '<li>Belum ada skor yang dicatat. Mulai main!</li>';
-        return;
-    }
-
-    leaderboard.forEach((player, index) => {
+    scores.forEach((player, index) => {
         const listItem = document.createElement('li');
         listItem.innerHTML = `
-            <strong>#${index + 1} ${player.name}</strong>: ${player.score} poin 
-            <span style="font-size: 0.8em; color: #aaa;">(${player.date})</span>
+            <strong>#${index + 1} ${player.name}</strong>: ${player.score} pts 
+            <span style="font-size: 0.8em; color: #ccc;">(${player.date})</span>
         `;
-        listElement.appendChild(listItem);
+        leaderboardList.appendChild(listItem);
     });
 }
 
-// --- FUNGSI HAPUS LEADERBOARD ---
-function clearLeaderboard() {
-    if (confirm('Apakah Anda yakin ingin menghapus semua data peringkat di browser ini?')) {
-        localStorage.removeItem(STORAGE_KEY);
-        loadLeaderboard();
-    }
-}
+// Muat leaderboard awal saat script berjalan
+document.addEventListener('DOMContentLoaded', loadGeneralLeaderboard);
